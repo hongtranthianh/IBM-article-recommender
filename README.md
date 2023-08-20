@@ -33,7 +33,7 @@ This project will analyze the interactions that users have with articles on the 
 1. Apply `user-user based collaborative filtering` method to make recommendation. By looking at users that are similar in terms of the items they have interacted with. These items would then be recommended to the similar users.
 2. Apply `rank-based` method to give recommendation for new users by finding the most popular articles simply based on the most interactions.
 
-**Note**: new users mean users without any interaction information so that we can not apply `user-user based collaborative filtering` method to make recommendation (aka `cold start problem`)
+**Note**: new users mean users without any interaction information so that we can not apply `user-user based collaborative filtering` method to make recommendation (aka **cold start problem**)
 
 3. Blend the code into a class that can be easily used with a web application ([recommender.py](https://github.com/hongtranthianh/IBM-article-recommender/blob/main/recommender.py)).
 
