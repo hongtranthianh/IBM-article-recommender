@@ -1,6 +1,27 @@
 import pandas as pd
 import numpy as np
 
+# Map email with user_id
+def email_mapper(df):
+    coded_dict = dict()
+    cter = 1
+    email_encoded = []
+    
+    for val in df['email']:
+        if val not in coded_dict:
+            coded_dict[val] = cter
+            cter+=1
+        email_encoded.append(coded_dict[val])
+
+    return email_encoded
+
+def email_mapper_df(df):
+    email_encoded = email_mapper(df)
+    del df['email']
+    df['user_id'] = email_encoded
+
+    return df
+
 # Part 1: Rank-Based Recommendations
 def get_top_articles(n, df):
     '''
@@ -64,7 +85,7 @@ def get_article_names(article_ids, df):
     return article_names # Return the article names associated with list of article ids
 
 
-def get_user_articles(user_id, user_item):
+def get_user_articles(user_id, df, user_item):
     '''
     INPUT:
     user_id - (int) a user id
@@ -83,6 +104,7 @@ def get_user_articles(user_id, user_item):
     article_names = get_article_names(article_ids,df)
     
     return article_ids, article_names # return the ids and names
+
 
 def get_top_sorted_users(user_id, df, user_item):
     '''
@@ -123,7 +145,7 @@ def get_top_sorted_users(user_id, df, user_item):
     return neighbors_df # Return the dataframe specified in the doc_string
 
 
-def user_user_recs_part2(user_id, m=10):
+def user_user_recs_part2(user_id, df, m=10):
     '''
     INPUT:
     user_id - (int) a user id
@@ -146,16 +168,18 @@ def user_user_recs_part2(user_id, m=10):
     before choosing those with fewer total interactions. 
    
     '''
+    user_item = create_user_item_matrix(df)
+    
     # Initiate an empty numpy array to store recommendation
     recs = np.array([])
 
     # Find similar user ids to the input user_id and the articles was seen by the user
     similar_user_ids = get_top_sorted_users(user_id, df=df, user_item=user_item)['neighbor_id'].tolist()
-    seen_articles = get_user_articles(user_id, user_item)[0]
+    seen_articles = get_user_articles(user_id, df, user_item=user_item)[0]
 
     # Loops through the users based on closeness to the input user_id
     for similar_user_id in similar_user_ids:
-        seen_article_of_similar_user = get_user_articles(similar_user_id, user_item)[0]
+        seen_article_of_similar_user = get_user_articles(similar_user_id, df, user_item)[0]
         # Finds articles the user hasn't seen before and provides them as recommendation
         rec_articles = np.setdiff1d(seen_article_of_similar_user, seen_articles, assume_unique=True)
         # Update 'recs' with the above 'rec_articles'
@@ -167,7 +191,7 @@ def user_user_recs_part2(user_id, m=10):
     recs = recs[:m].tolist()
 
     # Get article name
-    rec_names = get_article_names(recs,df)
+    rec_names = get_article_names(recs, df)
     
     return recs, rec_names
 
